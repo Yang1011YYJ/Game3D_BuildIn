@@ -30,7 +30,8 @@ public class desC : MonoBehaviour
     [Tooltip("主角位置")] public Transform playerTransform;
     [Tooltip("主角走路速度")] public float walkSpeed = 5f;
     [Tooltip("走到的「中間」位置")] public Transform middlePoint;
-
+    [Tooltip("手機鈴聲01")] public GameObject ring01;
+    [Tooltip("手機鈴聲02")] public GameObject ring02;
 
     [Header("腳本")]
     public AnimationScript animationScript;
@@ -67,6 +68,8 @@ public class desC : MonoBehaviour
         PhoneMessage.SetActive(false);
         DesPanel.SetActive(false);
         PlaceText.gameObject.SetActive(false);
+        ring01.SetActive(false);
+        ring02.SetActive(false);
         StartCoroutine(SceneFlow());
     }
     //public void StartButton()
@@ -80,10 +83,19 @@ public class desC : MonoBehaviour
 
     IEnumerator SceneFlow()
     {
+        //0.黑幕淡入
+        BlackPanel.SetActive(true);
+        animationScript.Fade(BlackPanel, 1f, 1f, 0f, null);
+        yield return new WaitForSeconds(1.5f);
+        BlackPanel.SetActive(false);
+
         //1.地點顯示
         PlaceText.gameObject.SetActive(true);
         animationScript.Fade(PlaceText.gameObject, 2f, 0f, 1f, null);
         yield return new WaitUntil(() => PlaceText.gameObject.GetComponent<CanvasGroup>().alpha == 1);
+        yield return new WaitForSeconds(1f);
+        animationScript.Fade(PlaceText.gameObject, 2f, 1f, 0f, null);
+        yield return new WaitUntil(() => PlaceText.gameObject.GetComponent<CanvasGroup>().alpha == 0);
         yield return new WaitForSeconds(1f);
         PlaceText.gameObject.SetActive(false);
 
@@ -102,16 +114,35 @@ public class desC : MonoBehaviour
         yield return new WaitForSeconds(cControllScript.phone.length);
 
         //4.播放進站時間的對話
+        Debug.Log("播放進站時間的對話");
+        dialogueSystemDesScript.autoNextLine = true;
         dialogueSystemDesScript.StartDialogue(dialogueSystemDesScript.Textfile01);
         yield return new WaitForSeconds(0.5f);
         yield return new WaitUntil(() => dialogueSystemDesScript.text01Finished);
+        yield return new WaitForSeconds(1.5f);
+        //對話結束，不看手機
+        dialogueSystemDesScript.TextPanel.SetActive(false);
+        PlayerAnimator.SetBool("phone", false);
 
         //5.播放皺眉動畫
         Debug.Log("皺眉");
         PlayerAnimator.SetBool("eyeclose", true);
-        yield return new WaitForSeconds(cControllScript.phone.length);
+        yield return new WaitForSeconds(cControllScript.eyeclose.length);
+        yield return new WaitForSeconds(1.5f);
 
-        //.播放音樂響的動畫
+        //6.播放音樂響的動畫
+        Debug.Log("播放音樂響的動畫");
+        ring01.SetActive(true);
+        ring02.SetActive(true);
+        ring01.GetComponent<Animator>().SetBool("ring", true);
+        ring02.GetComponent<Animator>().SetBool("ring", true);
+        yield return new WaitForSeconds(3f);
+
+        //7.不皺眉+看手機
+        Debug.Log("不皺眉+看手機");
+        PlayerAnimator.SetBool("eyeclose", false);
+        PlayerAnimator.SetBool("phone", true);
+        yield return new WaitForSeconds(cControllScript.phone.length);
 
         //    // 3. 
         //    Debug.Log("顯示圖片 Panel");

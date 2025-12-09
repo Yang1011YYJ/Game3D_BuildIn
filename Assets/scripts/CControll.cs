@@ -14,11 +14,12 @@ public class CControll : MonoBehaviour
     [Tooltip("遊戲失敗")] public AnimationClip die;
     [Tooltip("坐著睡著")] public AnimationClip sitsleep;
     [Tooltip("抓頭")] public AnimationClip Catch;
+    [Tooltip("閉眼")] public AnimationClip eyeclose;
 
     [Header("角色外表")]
     public SpriteRenderer spriteRenderer;
 
-    public Rigidbody2D rig;
+    public Rigidbody rig;
 
     [Header("移動參數")]
     public float moveSpeed = 5f;
@@ -58,7 +59,7 @@ public class CControll : MonoBehaviour
         // Rigidbody2D
         if (rig == null)
         {
-            rig = GetComponent<Rigidbody2D>();
+            rig = GetComponent<Rigidbody>();
         }
 
         firstScript = FindAnyObjectByType<First>();
