@@ -12,17 +12,12 @@ public class DialogueSystemGame00 : MonoBehaviour
     public TextMeshProUGUI DiaText;
     public Image FaceImage;
     public TextMeshProUGUI Name;
-    [Header("對話框寬度")]
-    public RectTransform dialogueBoxRect;
-    public float minWidth = 400f;
-    public float maxWidth = 900f;
-    public float padding = 80f;
+    [Tooltip("旁白對話框")] public GameObject NarraTextPanel;
 
     [Header("文本")]
     public TextAsset TextfileCurrent;
-    public TextAsset TextfileDes;
-    public TextAsset TextfileHowToPlay;
-    public TextAsset TextfileDescriptionCard;
+    public TextAsset TextfileGame00;
+    public TextAsset TextfileLookPhone;
 
     [Header("打字設定")]
     [Tooltip("讀到第幾行")]
@@ -48,6 +43,7 @@ public class DialogueSystemGame00 : MonoBehaviour
     void Start()
     {
         TextPanel.SetActive(false);
+        NarraTextPanel.SetActive(false);
     }
 
     void Update()
@@ -69,7 +65,7 @@ public class DialogueSystemGame00 : MonoBehaviour
 
                 if (index == TextList.Count)
                 {
-                    if(TextfileCurrent == TextfileHowToPlay)
+                    if(TextfileCurrent == TextfileGame00)
                     {
                         TextPanel.SetActive(false);
                         isTyping = false;
@@ -136,8 +132,6 @@ public class DialogueSystemGame00 : MonoBehaviour
 
         string line = TextList[index];
 
-        // 先依照這一行內容調整對話框的寬度
-        UpdateDialogueBoxWidth(line);
 
         // 開始打字機
         StartCoroutine(TypeLine(line));
@@ -187,21 +181,6 @@ public class DialogueSystemGame00 : MonoBehaviour
 
 
 
-    /// 依照目前這一行的文字長度調整對話框寬度
-    /// （記得對話框背景圖請用 Sliced Sprite 才不會變形）
-    void UpdateDialogueBoxWidth(string line)
-    {
-        if (dialogueBoxRect == null || DiaText == null) return;
-
-        DiaText.text = line;
-        DiaText.ForceMeshUpdate();
-
-        float preferred = DiaText.preferredWidth;
-        float targetWidth = Mathf.Clamp(preferred + padding, minWidth, maxWidth);
-
-        var size = dialogueBoxRect.sizeDelta;
-        size.x = targetWidth;
-        dialogueBoxRect.sizeDelta = size;
-    }
+    
 }
 

@@ -20,7 +20,8 @@ public class First : MonoBehaviour
     [Tooltip("異常畫面的背景")]public GameObject ErrorPanel;
     [Tooltip("設定異常的位置組")] public GameObject ErrorPlace;
     [Tooltip("教學-設定異常的位置組")] public GameObject ErrorPlaceTeach;
-    [Tooltip("教學-設定異常的圈圈")] public GameObject CirclePlaceTeach;
+    [Tooltip("設定異常的圈圈")] public GameObject CirclePlace;
+    //[Tooltip("教學-設定異常的圈圈")] public GameObject CirclePlaceTeach;
     [Tooltip("異常光線")] public Light ErrorLight;
     public bool StartError;
     [Tooltip("開始找錯")] public bool ErrorStart;
@@ -49,6 +50,7 @@ public class First : MonoBehaviour
     [Tooltip("失敗次數")] public int Mistake;
     // 避免重複判定，用一個旗標
     [Tooltip("避免重複判定")]public bool errorResultHandled = false;
+    
 
     private void Awake()
     {
@@ -68,7 +70,7 @@ public class First : MonoBehaviour
     {
         ErrorPanel.SetActive(false);
         ErrorPlace.SetActive(false);
-        CirclePlaceTeach.SetActive(false);
+        //CirclePlaceTeach.SetActive(false);
         ErrorPlaceTeach.SetActive(false);
         RedPanel.SetActive(false);
         ErrorLight.color = new Color(1, 0, 0, 0);
@@ -91,6 +93,7 @@ public class First : MonoBehaviour
         yield return FadeInStart();
 
         //1.等觸發第一個異常
+        cControllScript.playerControlEnabled = true;
         yield return new WaitUntil(() => eT1 == true);
 
         //2.1紅光亮起
@@ -98,7 +101,7 @@ public class First : MonoBehaviour
         yield return new WaitUntil(() => ErrorLight.color.a==1f);
 
         //2.1對話
-        DSG00.StartDialogue(DSG00.TextfileHowToPlay);
+        DSG00.StartDialogue(DSG00.TextfileLookPhone);
         yield return new WaitForSeconds(1f);
 
         //2.2看手機
@@ -219,7 +222,7 @@ public class First : MonoBehaviour
                 ErrorPlaceTeach.SetActive(false); // 關閉異常提示界面
             spotManager.ClearAllCircles();
             ErrorStart = false;
-            CirclePlaceTeach.SetActive(false);
+            CirclePlace.SetActive(false);
             animationScript.Fade(ErrorPanel,2f,1f,0f,null);
             yield return new WaitForSeconds(2f);
             ErrorPanel.SetActive(false);
@@ -277,7 +280,7 @@ public class First : MonoBehaviour
             ErrorPlaceTeach.SetActive(true);
             ErrorPanel.SetActive(true);
             animationScript.Fade(ErrorPanel, 2f, 0f, 1f, null);
-            CirclePlaceTeach.SetActive(true);
+            CirclePlace.SetActive(true);
             spotManager.RefreshActiveSpots();
             
         }

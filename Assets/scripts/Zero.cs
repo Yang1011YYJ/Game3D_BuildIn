@@ -95,7 +95,7 @@ public class Zero : MonoBehaviour
         yield return new WaitUntil(() => ErrorLight.color.a==1f);
 
         //2.1對話
-        DSG00.StartDialogue(DSG00.TextfileHowToPlay);
+        DSG00.StartDialogue(DSG00.TextfileLookPhone);
         yield return new WaitForSeconds(1f);
 
         //2.2看手機
