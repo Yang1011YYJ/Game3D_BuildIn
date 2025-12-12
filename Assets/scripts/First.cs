@@ -14,7 +14,8 @@ public class First : MonoBehaviour
     [Tooltip("場景中負責計算找錯誤數量的管理員")]public SpotManager spotManager;
     public DialogueSystemGame00 DSG00;
     public TimeControll timer;
-
+    public CameraMoveControll cameraMoveControllScript;
+    public PostExposureFader postExposureFaderScript;
 
     [Header("異常相關")]
     [Tooltip("異常畫面的背景")]public GameObject ErrorPanel;
@@ -31,6 +32,12 @@ public class First : MonoBehaviour
     [Header("玩家")]
     public GameObject Player;
     [Tooltip("玩家教學用自動走到的位置")]public Vector2 teachTargetPos = new Vector2(19.3f, -4.3f);
+
+    [Header("相機")]
+    public Vector3 CurrentPos;
+    public Vector3 TargetPos;
+    public float MoveSpeed =5f;
+    public float lightUPDuration = 1.2f; 
 
     [Header("教學")]
     [Tooltip("查看教學")] public bool CheckTeach = false;
@@ -57,6 +64,8 @@ public class First : MonoBehaviour
         animationScript = GetComponent<AnimationScript>();
         DSG00 = FindAnyObjectByType<DialogueSystemGame00>();
         timer = FindAnyObjectByType<TimeControll>();
+        cameraMoveControllScript = FindAnyObjectByType<CameraMoveControll>();
+        postExposureFaderScript = FindAnyObjectByType<PostExposureFader>();
         if (cControllScript == null)
         {
             cControllScript = FindAnyObjectByType<CControll>();
@@ -90,11 +99,30 @@ public class First : MonoBehaviour
 
     IEnumerator SceneFlow()
     {
-        yield return FadeInStart();
+        // 1. 黑幕淡出
+        //if (BlackPanel != null)
+        //{
+        //    BlackPanel.SetActive(true);
+        //    animationScript.Fade(
+        //        BlackPanel,
+        //        1.5f/*持續時間*/,
+        //        1f,
+        //        0f,
+        //        null
+        //    );
 
-        //1.等觸發第一個異常
-        cControllScript.playerControlEnabled = true;
-        yield return new WaitUntil(() => eT1 == true);
+        //    yield return new WaitForSeconds(1.5f);
+        //    BlackPanel.SetActive(false);
+        //}
+        yield return StartCoroutine(postExposureFaderScript.FadeExposure(lightUPDuration/*持續時間*/, -3f, 0f));
+
+
+        // 2. 鏡頭回到公車內（先把鏡頭放在起點，再移到目標）
+        cameraMoveControllScript.camera.transform.position = CurrentPos;
+        yield return StartCoroutine(cameraMoveControllScript.MoveCameraTo(TargetPos, MoveSpeed));
+
+        //3.車頂燈光閃爍
+
 
         //2.1紅光亮起
         redLight();
@@ -159,24 +187,6 @@ public class First : MonoBehaviour
         }
     }
 
-    public IEnumerator FadeInStart()//一開始的黑幕淡入
-    {
-        // 1. 黑幕淡出
-        if (BlackPanel != null)
-        {
-            BlackPanel.SetActive(true);
-            animationScript.Fade(
-                BlackPanel,
-                1.5f,
-                1f,
-                0f,
-                null
-            );
-            
-            yield return new WaitForSeconds(1.5f);
-            BlackPanel.SetActive(false);
-        }
-    }
     public IEnumerator AbnormalLight(float duration,float start, float end)//讓窗外異常光線啟動（瞬間變紅、變亮）
     {
         float timer = 0f;

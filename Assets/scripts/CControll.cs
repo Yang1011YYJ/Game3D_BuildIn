@@ -19,6 +19,12 @@ public class CControll : MonoBehaviour
     [Header("角色外表")]
     public SpriteRenderer spriteRenderer;
 
+    [Header("相機")]
+    public Camera targetCamera;
+    [Tooltip("鎖定X：避免上下仰俯（常用）")] public bool lockX = false; // 鎖定X：避免上下仰俯（常用）
+    [Tooltip("鎖定Y：避免上下仰俯（常用）")] public bool lockY = false;
+    [Tooltip("鎖定Z：避免上下仰俯（常用）")] public bool lockZ = false;
+
     public Rigidbody rig;
 
     [Header("移動參數")]
@@ -67,6 +73,26 @@ public class CControll : MonoBehaviour
     void Start()
     {
 
+    }
+
+    void LateUpdate()
+    {
+        if (!targetCamera) targetCamera = Camera.main;
+        if (!targetCamera) return;
+
+        Vector3 camForward = targetCamera.transform.forward;
+
+        // 如果你想要「只在水平面轉」（像站在地上），改用：
+        camForward = Vector3.ProjectOnPlane(camForward, Vector3.up);
+
+        Quaternion rot = Quaternion.LookRotation(camForward, Vector3.up);
+        Vector3 e = rot.eulerAngles;
+
+        if (lockX) e.x = transform.eulerAngles.x;
+        if (lockY) e.y = transform.eulerAngles.y;
+        if (lockZ) e.z = transform.eulerAngles.z;
+
+        transform.rotation = Quaternion.Euler(e);
     }
 
     // Update is called once per frame
